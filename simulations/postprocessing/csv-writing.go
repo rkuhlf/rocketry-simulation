@@ -5,24 +5,29 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 )
 
-func saveResultToFile(data []map[string]string, fileName string) {
+func saveResultToFile(data []map[string]string, fileName string) error {
 	// Get headers from the first map
 	headers := getHeaders(data)
 
-	// Create a CSV file
+	dirPath := filepath.Dir(fileName)
+	if err := os.MkdirAll(dirPath, 0755); err != nil {
+		return err
+	}
+
 	file, err := os.Create(fileName)
 	if err != nil {
-		fmt.Println("Error creating file:", err)
-		return
+		return fmt.Errorf("error creating file: %v", err)
 	}
 	defer file.Close()
 
-	// Write CSV data
 	if err := writeCSV(file, headers, data); err != nil {
-		fmt.Println("Error writing CSV:", err)
+		return fmt.Errorf("error writing CSV %v", err)
 	}
+
+	return nil
 }
 
 // getHeaders extracts keys from the first map as headers
