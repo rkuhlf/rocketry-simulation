@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	simulations.DrainSimulation()
+	simulations.DrainSimulationBattery()
 }

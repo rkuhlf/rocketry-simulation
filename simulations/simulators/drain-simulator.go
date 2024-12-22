@@ -1,10 +1,13 @@
 package simulators
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Vessel interface {
 	UpdateState(timeStep float64, massChange float64) error
 	FluidMass() float64
+	Pressure() float64
 }
 
 type flowRateFunc func(Vessel) float64
@@ -36,7 +39,8 @@ func (d *drainSimulator) Simulate() []DrainSimulationRecord {
 
 	for {
 		massChange := d.flowRateFunc(d.vessel) * d.timeStep
-		if massChange > d.vessel.FluidMass() {
+		if d.vessel.FluidMass()+massChange < 0 {
+			fmt.Printf("Stopping drain because massChange=%f and fluidMass=%f", massChange, d.vessel.FluidMass())
 			break
 		}
 
@@ -46,6 +50,7 @@ func (d *drainSimulator) Simulate() []DrainSimulationRecord {
 		record := DrainSimulationRecord{
 			currentTime,
 			d.vessel.FluidMass(),
+			d.vessel.Pressure(),
 		}
 
 		result = append(result, record)
@@ -64,8 +69,10 @@ func (d *drainSimulator) Simulate() []DrainSimulationRecord {
 type DrainSimulationRecord struct {
 	Time float64
 	Mass float64
+	// Pressure in Pa.
+	Pressure float64
 }
 
 func (d DrainSimulationRecord) String() string {
-	return fmt.Sprintf("{ Time: %.2f s, Mass: %.2f kg }", d.Time, d.Mass)
+	return fmt.Sprintf("{ Time: %.2f s, Mass: %.2f kg, Pressure: %.2f Pa }", d.Time, d.Mass, d.Pressure)
 }
