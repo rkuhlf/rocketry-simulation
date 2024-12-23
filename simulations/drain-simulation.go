@@ -13,11 +13,11 @@ var updateEnthalpyPressureVesselAdapter = func(vessel *pressurevessel.EnthalpyPr
 }
 
 var updateConstantPressureVesselAdapter = func(vessel *pressurevessel.ConstantPressureVessel, timeStep, massChange float64) error {
-	return vessel.UpdateState(timeStep, massChange)
+	return vessel.UpdateState(massChange)
 }
 
 var updatePrPressureVesselAdapter = func(vessel *pressurevessel.PrPressureVessel, timeStep, massChange float64) error {
-	return vessel.UpdateState(timeStep, massChange)
+	return vessel.UpdateState(massChange)
 }
 
 func DrainSimulation() {

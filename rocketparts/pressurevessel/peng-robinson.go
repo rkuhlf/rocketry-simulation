@@ -38,7 +38,7 @@ func NewPrPressureVessel(fluidMass, pressure, temperature, molarMass, volume flo
 /**
 * Takes the temperature of the mass change.
  */
-func (p *PrPressureVessel) UpdateState(timeStep float64, massChange float64) error {
+func (p *PrPressureVessel) UpdateState(massChange float64) error {
 	if p.fluidMass < massChange {
 		return fmt.Errorf("could not update state to have a negative fluid mass")
 	}

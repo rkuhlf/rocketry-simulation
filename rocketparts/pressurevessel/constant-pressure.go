@@ -18,7 +18,7 @@ func NewConstantPressureVessel(fluidMass float64, pressure float64) *ConstantPre
 	}
 }
 
-func (p *ConstantPressureVessel) UpdateState(timeStep float64, massChange float64) error {
+func (p *ConstantPressureVessel) UpdateState(massChange float64) error {
 	if p.fluidMass < massChange {
 		return fmt.Errorf("could not update state to have a negative fluid mass")
 	}
