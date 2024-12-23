@@ -75,6 +75,7 @@ func (p *prPressureVessel) FluidMass() float64 {
 	return p.fluidMass
 }
 
+// These properties are from chatGPT.
 var R = 8.314     // Universal gas constant, J/(mol·K)
 var Tc = 304.2    // Critical temperature, K
 var Pc = 7.38e6   // Critical pressure, Pa

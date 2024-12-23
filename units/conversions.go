@@ -23,3 +23,11 @@ func FeetToMeters(feet float64) float64 {
 func InchesToMeters(inches float64) float64 {
 	return inches / 12 / 3.2808399
 }
+
+func CelsiusToKelvin(celsius float64) float64 {
+	return celsius + 273.15
+}
+
+func KelvinToCelsius(kelvin float64) float64 {
+	return kelvin - 273.15
+}
