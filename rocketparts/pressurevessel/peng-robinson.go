@@ -9,7 +9,7 @@ import (
 	"github.com/khezen/rootfinding"
 )
 
-type prPressureVessel struct {
+type PrPressureVessel struct {
 	// Measured in kg.
 	fluidMass float64
 	// Measured in Pa.
@@ -25,8 +25,8 @@ type prPressureVessel struct {
 /**
 * Assumes constant temperature.
  */
-func PrPressureVessel(fluidMass, pressure, temperature, molarMass, volume float64) *prPressureVessel {
-	return &prPressureVessel{
+func NewPrPressureVessel(fluidMass, pressure, temperature, molarMass, volume float64) *PrPressureVessel {
+	return &PrPressureVessel{
 		fluidMass:   fluidMass,
 		pressure:    pressure,
 		temperature: temperature,
@@ -38,7 +38,7 @@ func PrPressureVessel(fluidMass, pressure, temperature, molarMass, volume float6
 /**
 * Takes the temperature of the mass change.
  */
-func (p *prPressureVessel) UpdateState(timeStep float64, massChange float64) error {
+func (p *PrPressureVessel) UpdateState(timeStep float64, massChange float64) error {
 	if p.fluidMass < massChange {
 		return fmt.Errorf("could not update state to have a negative fluid mass")
 	}
@@ -49,7 +49,7 @@ func (p *prPressureVessel) UpdateState(timeStep float64, massChange float64) err
 }
 
 // Returns in m^3 / mol.
-func (p *prPressureVessel) molarVolume() (float64, error) {
+func (p *PrPressureVessel) molarVolume() (float64, error) {
 	if p.fluidMass == 0 {
 		return 0, errors.New("division by zero error computing molar volume")
 	}
@@ -58,7 +58,7 @@ func (p *prPressureVessel) molarVolume() (float64, error) {
 	return p.volume / moles, nil
 }
 
-func (p *prPressureVessel) Pressure() float64 {
+func (p *PrPressureVessel) Pressure() float64 {
 	if p.fluidMass == 0 {
 		return 0
 	}
@@ -71,7 +71,7 @@ func (p *prPressureVessel) Pressure() float64 {
 	return pressure_pr_eos(v, p.temperature)
 }
 
-func (p *prPressureVessel) FluidMass() float64 {
+func (p *PrPressureVessel) FluidMass() float64 {
 	return p.fluidMass
 }
 

@@ -24,34 +24,47 @@ const (
 	Equilibrium
 )
 
-type enthalpyPressureVessel struct {
+type EnthalpyPressureVessel struct {
+	fluidProperties fluidProperties
 	// Measured in kg.
 	fluidMass float64
 	// Measured in joules.
 	enthalpy float64
-	// in g/mol
-	molarMass float64
 	// in m^3
 	volume float64
 }
 
+type fluidProperties interface {
+	MolarMass() float64
+	CriticalTemperature() float64
+	Density(float64) (float64, float64)
+	Enthalpy(float64) (float64, float64)
+}
+
 // Supplies the initial temperature.
-func EnthalpyPressureVessel(fluidMass, temperature, volume, molarMass float64) *enthalpyPressureVessel {
-	quality := computeQuality(fluidMass, temperature, volume, molarMass, vaporDensity, liquidDensity, supercriticalTemperature)
-	vaporSpecificEnthalpy, liquidSpecificEnthalpy := getEnthalpy(temperature)
+func NewEnthalpyPressureVessel(fluidMass, temperature, volume float64, fluidProperties fluidProperties) *EnthalpyPressureVessel {
+	vaporDensity, liquidDensity := fluidProperties.Density(temperature)
+
+	quality, _ := computeQuality(fluidMass, temperature, volume, fluidProperties.MolarMass(), vaporDensity, liquidDensity, fluidProperties.CriticalTemperature())
+
+	// TODO: Handle it appropriately depending on what phase it is in - I need to be able to make some approximation of the non-saturated enthalpy.
+
+	vaporSpecificEnthalpy, liquidSpecificEnthalpy := fluidProperties.Enthalpy(temperature)
 	totalEnthalpy := fluidMass*quality*vaporSpecificEnthalpy + fluidMass*(1-quality)*liquidSpecificEnthalpy
 
-	return &enthalpyPressureVessel{
-		fluidMass: fluidMass,
-		volume:    volume,
-		molarMass: molarMass,
-		enthalpy:  totalEnthalpy,
+	fmt.Println(totalEnthalpy)
+
+	return &EnthalpyPressureVessel{
+		fluidMass:       fluidMass,
+		volume:          volume,
+		fluidProperties: fluidProperties,
+		enthalpy:        totalEnthalpy,
 	}
 }
 
 // The temperature of the mass being added or removed.
-func (p *enthalpyPressureVessel) UpdateState(timeStep, massChange, temperature float64) error {
-	if p.fluidMass < massChange {
+func (p *EnthalpyPressureVessel) UpdateState(massChange float64, temperature float64) error {
+	if p.fluidMass+massChange < 0 {
 		return fmt.Errorf("could not update state to have a negative fluid mass")
 	}
 	p.fluidMass += massChange
@@ -59,15 +72,15 @@ func (p *enthalpyPressureVessel) UpdateState(timeStep, massChange, temperature f
 	return nil
 }
 
-func (p *enthalpyPressureVessel) Pressure() float64 {
-
+func (p *EnthalpyPressureVessel) Pressure() float64 {
+	return 0
 }
 
-func (p *enthalpyPressureVessel) FluidMass() float64 {
+func (p *EnthalpyPressureVessel) FluidMass() float64 {
 	return p.fluidMass
 }
 
-func (p *enthalpyPressureVessel) Temperature() float64 {
+func (p *EnthalpyPressureVessel) Temperature() float64 {
 	return p.fluidMass
 }
 

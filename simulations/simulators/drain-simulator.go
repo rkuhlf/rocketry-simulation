@@ -5,33 +5,35 @@ import (
 )
 
 type Vessel interface {
-	UpdateState(timeStep float64, massChange float64) error
 	FluidMass() float64
 	Pressure() float64
 }
 
 type flowRateFunc func(Vessel) float64
+type updateFunc[K any] func(K, float64, float64) error
 
 /**
 * Holds the setup of the simulation.
 * The simulation can be run over and over again by calling Simulate().
  */
-type drainSimulator struct {
-	vessel   Vessel
+type DrainSimulator[K Vessel] struct {
+	vessel   K
 	timeStep float64
 	// Takes the vessel and returns what the flow rate out of it is.
 	flowRateFunc flowRateFunc
+	updateFunc   updateFunc[K]
 }
 
-func DrainSimulator(vessel Vessel, timeStep float64, flowRateFunc flowRateFunc) *drainSimulator {
-	return &drainSimulator{
+func NewDrainSimulator[K Vessel](vessel K, updateFunc updateFunc[K], timeStep float64, flowRateFunc flowRateFunc) *DrainSimulator[K] {
+	return &DrainSimulator[K]{
 		timeStep:     timeStep,
 		vessel:       vessel,
 		flowRateFunc: flowRateFunc,
+		updateFunc:   updateFunc,
 	}
 }
 
-func (d *drainSimulator) Simulate() []DrainSimulationRecord {
+func (d *DrainSimulator[K]) Simulate() []DrainSimulationRecord {
 	fmt.Println("Starting drain simulation")
 	result := make([]DrainSimulationRecord, 0)
 	currentTime := float64(0)
@@ -44,7 +46,7 @@ func (d *drainSimulator) Simulate() []DrainSimulationRecord {
 			break
 		}
 
-		d.vessel.UpdateState(d.timeStep, massChange)
+		d.updateFunc(d.vessel, d.timeStep, massChange)
 
 		currentTime += d.timeStep
 		record := DrainSimulationRecord{

@@ -1,10 +1,8 @@
 package main
 
-import (
-	"github.com/rkuhlf/rocketry-simulation/chemistryvisualization"
-)
+import "github.com/rkuhlf/rocketry-simulation/simulations"
 
 func main() {
-	// simulations.DrainSimulationBattery()
-	chemistryvisualization.VisualizeNitrous("./.local/nitrous-properties")
+	simulations.DrainSimulation()
+	// chemistryvisualization.VisualizeNitrous("./.local/nitrous-properties")
 }

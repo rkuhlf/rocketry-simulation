@@ -4,21 +4,21 @@ import (
 	"fmt"
 )
 
-type constantPressureVessel struct {
+type ConstantPressureVessel struct {
 	// Measured in kg.
 	fluidMass float64
 	// Measured in Pa.
 	pressure float64
 }
 
-func ConstantPressureVessel(fluidMass float64, pressure float64) *constantPressureVessel {
-	return &constantPressureVessel{
+func NewConstantPressureVessel(fluidMass float64, pressure float64) *ConstantPressureVessel {
+	return &ConstantPressureVessel{
 		fluidMass: fluidMass,
 		pressure:  pressure,
 	}
 }
 
-func (p *constantPressureVessel) UpdateState(timeStep float64, massChange float64) error {
+func (p *ConstantPressureVessel) UpdateState(timeStep float64, massChange float64) error {
 	if p.fluidMass < massChange {
 		return fmt.Errorf("could not update state to have a negative fluid mass")
 	}
@@ -27,10 +27,10 @@ func (p *constantPressureVessel) UpdateState(timeStep float64, massChange float6
 	return nil
 }
 
-func (p *constantPressureVessel) Pressure() float64 {
+func (p *ConstantPressureVessel) Pressure() float64 {
 	return p.pressure
 }
 
-func (p *constantPressureVessel) FluidMass() float64 {
+func (p *ConstantPressureVessel) FluidMass() float64 {
 	return p.fluidMass
 }
